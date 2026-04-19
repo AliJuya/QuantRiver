@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Local environment files
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Local outputs
+backtest_reports/
+results/
+
+# Local datasets and trade artifacts
+*.jsonl
+*.parquet
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

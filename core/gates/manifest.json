@@ -1,0 +1,8 @@
+﻿{
+  "version": 1,
+  "strategy_to_gate": {
+    "TBPC_AIV2": "TBPC_AIV2_gate_v1",
+    "TrendBreakPullbackContinue5m": "TBPC_AIV2_gate_v1",
+    "TrendIgnition5m": "TrendIgnition_gate_v1"
+  }
+}
