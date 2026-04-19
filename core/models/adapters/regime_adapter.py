@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import math
-from pathlib import Path
 from typing import Any, Mapping
 
 from ..base import RegimeSnapshot
@@ -62,19 +61,13 @@ class RegimeAdapter:
         base_tf: str = "1h",
         vol_pair_key: str | None = None,
         vol_adapter: VolAdapter | None = None,
-        artifacts_dir: Path | None = None,
         engine: RegimeEngine | None = None,
-        strict_artifacts: bool = False,
-        version: str = "v1",
+        version: str = "public",
     ) -> None:
         if vol_pair_key is not None and vol_adapter is not None:
             raise ValueError("Pass only one of vol_pair_key or vol_adapter to RegimeAdapter.")
-        self.artifacts_dir = artifacts_dir or (
-            Path(__file__).resolve().parents[1] / "regime_engine" / "artifacts" / "selected"
-        )
-        self._engine = engine
-        self.strict_artifacts = bool(strict_artifacts)
-        self.version = version
+        self._engine = engine or RegimeEngine()
+        self.version = str(version)
         self.base_tf = str(base_tf)
         self._vol_adapter = vol_adapter or (VolAdapter(pair_key=str(vol_pair_key)) if vol_pair_key else None)
         self.warmup = {self.base_tf: 2}
@@ -85,23 +78,8 @@ class RegimeAdapter:
         self._last_seen_ts: int | None = None
         self._last_payload: dict[str, Any] | None = None
 
-        if self._engine is None and self.strict_artifacts:
-            self._engine = self._build_engine()
-
-    def _build_engine(self) -> RegimeEngine:
-        hmm_path = self.artifacts_dir / "hmm_params.npz"
-        scalers_path = self.artifacts_dir / "scalers.json"
-        if not hmm_path.exists() or not scalers_path.exists():
-            raise FileNotFoundError(
-                f"Regime artifacts are missing under {self.artifacts_dir}. "
-                "Expected hmm_params.npz and scalers.json."
-            )
-        return RegimeEngine(artifacts_selected_dir=self.artifacts_dir)
-
     @property
     def engine(self) -> RegimeEngine:
-        if self._engine is None:
-            self._engine = self._build_engine()
         return self._engine
 
     def _fallback_return(self, state: Any) -> float:

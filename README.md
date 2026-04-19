@@ -1,128 +1,31 @@
-# QuantRiver Public
+# QuantRiver
 
-QuantRiver Public is a stripped-down, publish-safe version of the QuantRiver architecture:
+QuantRiver is an event-driven backtesting and paper-trading framework for crypto markets. It is structured so strategies, models, gates, and data sources can be swapped without rewriting the engine core.
 
-- event-driven market data engine
-- closed-candle state management
+This public version keeps the architecture, execution flow, and extension points, while removing private research logic, trained artifacts, and order-routing infrastructure.
+
+## What You Get
+
+- event-driven data engine with bounded rivers
+- higher-timeframe aggregation from a lower-timeframe source
 - backtest runner
 - paper runner
 - live market-data runner
-- example strategies
-- optional model/gate integration points
+- two public example strategies
+- placeholder model and gate integration seams
+- sample ETHUSDT dataset included for a quick local backtest
 
-This repository is meant to demonstrate the architecture clearly enough that another engineer can:
+## What Is Intentionally Not Included
 
-1. run it locally,
-2. understand the flow end to end,
-3. swap in their own data, strategies, or models,
-4. extend it without reverse-engineering private project details.
+- private model artifacts
+- proprietary feature engineering
+- private strategy packs
+- brokerage credentials
+- exchange order execution bridge
 
-## What This Public Repo Includes
+The public `live` runner processes live market data and emits execution intents. It does not place exchange orders by itself.
 
-- `core/data_engine/`
-  Data ingestion, 1s builder from ticks, candle rivers, and higher-timeframe aggregation.
-- `core/engine/`
-  The event loop, strategy routing, signal normalization, and execution flow.
-- `core/execution/`
-  Backtest, paper, and live execution adapters plus the position handler and reporting.
-- `core/strategies/`
-  Two public example strategies:
-  - `EMACross5mStrategy`
-  - `OpeningRangeBreakout5m`
-- `core/models/`
-  Public-safe placeholder model orchestration layer. The wiring remains, but proprietary research logic is intentionally not shipped.
-- `adapters/backtest/`
-  Parquet-backed backtest data sources.
-- `adapters/live/`
-  Binance REST and WebSocket market-data adapters.
-- `runners/`
-  Small entry points for backtest, paper, and live usage.
-
-## What This Public Repo Does Not Include
-
-- proprietary trained artifacts
-- private research scripts
-- private feature engineering stacks
-- exchange order-routing credentials or brokerage automation
-
-The `live` runner in this public repository means:
-
-- live market data
-- live signal generation
-- live engine/event processing
-
-It does **not** place exchange orders by itself.
-
-## Architecture Overview
-
-At a high level the runtime flow is:
-
-1. A source produces ticks or closed candles.
-2. `DataEngine` stores them in bounded rivers.
-3. `CandleAggregatorTF` builds higher timeframes from the configured base timeframe.
-4. `IndicatorEngine` updates indicator values on each closed bar.
-5. `StrategyRouter` asks each strategy for decisions on the relevant timeframe.
-6. `SignalEngine` normalizes those decisions into `ExecutionIntent`s.
-7. An execution adapter handles those intents:
-   - backtest: simulated fills + report files
-   - paper: simulated fills on live data
-   - live: queues intents for an external executor
-
-Optional model and gate layers can sit between state and signal execution, but they are off by default in the public runners.
-
-## Dynamic Data Engine
-
-The public data engine supports:
-
-- `ticks`
-- closed candles in `1s`, `1m`, `5m`, `15m`, `1h`, `2h`, `1d`
-- any valid `Ns`, `Nm`, `Nh`, `Nd` source timeframe
-
-Higher timeframes are built upward from that source timeframe.
-
-Examples:
-
-- `1s -> 1m -> 5m -> 15m`
-- `5m -> 15m -> 1h -> 4h`
-- `1h -> 4h -> 1d`
-
-It does **not** downsample into lower timeframes.
-
-Important:
-
-- the engine/adapters are dynamic
-- the public example backtest runner still uses a `1s` candle input path by default for higher-fidelity stop/TP handling
-
-If you want to build a custom runner from `5m` or `1h` directly, the engine and parquet source layer now support that.
-
-## Repository Layout
-
-```text
-QuantRiver-public/
-├── adapters/
-│   ├── backtest/
-│   └── live/
-├── core/
-│   ├── data_engine/
-│   ├── engine/
-│   ├── execution/
-│   ├── gates/
-│   ├── indicators/
-│   ├── models/
-│   ├── state/
-│   ├── strategies/
-│   └── types/
-├── runners/
-│   ├── run_backtest.py
-│   ├── run_paper.py
-│   ├── run_live.py
-│   └── runtime_config.py
-├── .env.example
-├── pyproject.toml
-└── README.md
-```
-
-## Installation
+## Quick Start
 
 ### 1. Create a virtual environment
 
@@ -140,23 +43,13 @@ python -m venv .venv
 source .venv/bin/activate
 ```
 
-### 2. Install the package
+### 2. Install
 
 ```bash
 pip install -e .
 ```
 
-If you want to experiment with the optional gate layer:
-
-```bash
-pip install -e ".[gates]"
-```
-
-### 3. Create a local `.env`
-
-The runners automatically read a repo-root `.env` file through `runners/runtime_config.py`.
-
-Copy the example:
+### 3. Create your local `.env`
 
 PowerShell:
 
@@ -170,122 +63,176 @@ Bash:
 cp .env.example .env
 ```
 
-Then edit the values you want.
+### 4. Run the included sample backtest
 
-## Runner Summary
+The repository ships a small sample day at:
+
+`data/klines/ETHUSDT/1s/2024/01/01.parquet`
+
+With the default public `.env.example`, this command should run against that sample:
+
+```powershell
+py -3 -m runners.run_backtest
+```
+
+Sample output image:
+
+![Sample backtest output](docs/sample_backtest_output.png)
+
+## Repository Layout
+
+```text
+QuantRiver-public/
+|-- adapters/
+|   |-- backtest/
+|   `-- live/
+|-- core/
+|   |-- data_engine/
+|   |-- engine/
+|   |-- execution/
+|   |-- gates/
+|   |-- indicators/
+|   |-- models/
+|   |-- state/
+|   |-- strategies/
+|   `-- types/
+|-- data/
+|   `-- klines/
+|-- docs/
+|-- runners/
+|   |-- run_backtest.py
+|   |-- run_live.py
+|   |-- run_paper.py
+|   `-- runtime_config.py
+|-- .env.example
+|-- pyproject.toml
+`-- README.md
+```
+
+## Public Strategies
+
+The public repo intentionally keeps only two simple strategies:
+
+- `EMACross5mStrategy`
+- `OpeningRangeBreakout5m`
+
+Relevant files:
+
+- `core/strategies/strategy_ema_cross_5m.py`
+- `core/strategies/strategy_opening_range_breakout_5m.py`
+- `core/strategies/__init__.py`
+
+## Runner Overview
 
 ### `runners/run_backtest.py`
 
 Purpose:
 
-- loads local parquet candle data
-- seeds warmup history
-- runs strategies through the event engine
-- simulates fills through `BacktestExecutionAdapter`
-- writes monthly and aggregate reports
+- load local parquet candles
+- seed warmup history
+- run strategies through the event engine
+- simulate fills through `BacktestExecutionAdapter`
+- write monthly and aggregate reports
 
-Default public assumption:
+Important:
 
-- input source is closed `1s` candles from local parquet files
+- the public backtest runner uses closed `1s` candle files by default
+- the underlying data source and data engine are still designed so you can build custom runners from other source timeframes later
 
 ### `runners/run_paper.py`
 
 Purpose:
 
-- consumes live Binance aggTrade ticks
-- builds candles in real time
-- runs strategies and paper-fills locally
-- never sends exchange orders
+- consume live Binance market data
+- build candles in real time
+- run strategies locally
+- simulate fills with the paper execution adapter
 
 ### `runners/run_live.py`
 
 Purpose:
 
-- consumes live Binance aggTrade ticks
-- runs the engine in real time
-- produces live execution intents
+- consume live Binance market data
+- run the engine in real time
+- emit execution intents
 
-This public runner is architecture/demo focused. It does not route orders to Binance.
+Important:
 
-## Configuration Model
+- it does not place exchange orders
+- it is a market-data and intent-generation example runner
 
-All public runners use environment variables, either from your shell or from the repo-root `.env` file.
+## Configuration
 
-### Shared Variables
+All runners read environment variables either from your shell or from the repo-root `.env` file.
+
+### Shared variables
 
 | Variable | Meaning | Default |
 |---|---|---|
 | `QR_SYMBOL` | Trading symbol | `ETHUSDT` |
-| `QR_ENABLE_EMA_CROSS_5M` | Enable the EMA cross strategy | `true` |
-| `QR_ENABLE_ORB_5M` | Enable the ORB strategy | `false` |
+| `QR_ENABLE_EMA_CROSS_5M` | Enable EMA cross | `true` |
+| `QR_ENABLE_ORB_5M` | Enable ORB | `false` |
 
-### EMA Strategy Variables
+### EMA strategy variables
 
 | Variable | Meaning | Default |
 |---|---|---|
 | `QR_EMA_FAST_LEN` | Fast EMA length | `12` |
 | `QR_EMA_SLOW_LEN` | Slow EMA length | `48` |
-| `QR_EMA_STOP_MODE` | Stop mode: `atr` or `usd` | `atr` |
+| `QR_EMA_STOP_MODE` | `atr` or `usd` | `atr` |
 | `QR_EMA_STOP_VALUE` | Stop size in ATR or USD | `1.5` |
-| `QR_EMA_TARGET_MODE` | Target mode: `atr` or `usd` | `atr` |
+| `QR_EMA_TARGET_MODE` | `atr` or `usd` | `atr` |
 | `QR_EMA_TARGET_VALUE` | Target size in ATR or USD | `3.0` |
 
-### Backtest Variables
+### Backtest variables
 
 | Variable | Meaning | Default |
 |---|---|---|
 | `QR_KLINES_BASE_PATH` | Root folder for backtest parquet data | `data/klines` |
 | `QR_MODEL_KLINES_BASE_PATH` | Root folder for model-native parquet data | `data/model_klines` |
 | `QR_REPORTS_BASE_DIR` | Output folder for reports | `backtest_reports` |
-| `QR_YEARS` | Years list or inclusive 2-point range | `2022,2025` |
-| `QR_MONTHS` | Months list or inclusive 2-point range | `1,12` |
-| `QR_DAY_FROM` | Starting day of month | `1` |
-| `QR_DAY_TO` | Ending day of month | `31` |
-| `QR_AUTO_DAY_TO` | If `true`, auto-expand to the last available day in the month | `true` |
+| `QR_YEARS` | Years list or inclusive range | `2024,2024` |
+| `QR_MONTHS` | Months list or inclusive range | `1,1` |
+| `QR_DAY_FROM` | Starting day | `1` |
+| `QR_DAY_TO` | Ending day | `1` |
+| `QR_AUTO_DAY_TO` | Auto-expand to month end | `false` |
 | `QR_START_BALANCE` | Starting equity | `1000` |
-| `QR_MAX_WORKERS` | Parallel month workers | auto |
-| `QR_WRITE_AGGREGATE_ARTIFACTS` | Write combined reports and equity plots | `true` |
-| `QR_VERBOSE_MONTH_LOGS` | Print more progress | `false` |
-| `QR_RUN_NAME_OVERRIDE` | Optional custom run-name prefix | empty |
-| `QR_TRAILING_ENABLED` | Enable trailing logic in the position handler | `false` |
+| `QR_MAX_WORKERS` | Parallel month workers | `4` |
+| `QR_WRITE_AGGREGATE_ARTIFACTS` | Write combined reports | `true` |
+| `QR_VERBOSE_MONTH_LOGS` | More console progress | `false` |
+| `QR_RUN_NAME_OVERRIDE` | Optional run-name prefix | empty |
+| `QR_TRAILING_ENABLED` | Enable trailing logic | `false` |
 | `QR_FEE_RATE` | Per-side fee rate | `0.0004` |
 | `QR_SLIPPAGE_RATE` | Per-side slippage rate | `0.0002` |
-| `QR_BACKTEST_USE_MODELS` | Turn on the model layer for backtests | `false` |
+| `QR_BACKTEST_USE_MODELS` | Turn on model layer for backtests | `false` |
 
-### Paper / Live Variables
+### Paper / live variables
 
 | Variable | Meaning | Default |
 |---|---|---|
-| `QR_IS_USD_M_FUTURES` | `true` for USD-M futures, `false` for coin-M | `true` |
+| `QR_IS_USD_M_FUTURES` | `true` for USD-M futures | `true` |
 | `QR_BINANCE_REST_BASE_URL` | REST base URL | `https://fapi.binance.com` |
 | `QR_BINANCE_REST_TIMEOUT_SEC` | REST timeout | `10` |
 | `QR_WS_TIMEOUT_SEC` | WebSocket timeout | `20` |
 | `QR_LOG_INTERVAL_SEC` | Console status interval | `1` |
 | `QR_USE_MODELS` | Turn on model modules | `false` |
-| `QR_USE_GATES` | Turn on gate artifacts | `false` |
+| `QR_USE_GATES` | Turn on placeholder gate evaluation | `false` |
 
-Important:
+## Data Layout
 
-- `QR_USE_GATES=true` requires `QR_USE_MODELS=true`
-- gate usage also requires the optional LightGBM dependency and actual gate artifacts
-
-## Backtest Data Layout
-
-The public example backtest runner expects this directory shape:
+The sample backtest uses this folder shape:
 
 ```text
 data/
-└── klines/
-    └── ETHUSDT/
-        └── 1s/
-            └── 2022/
-                └── 01/
-                    ├── 01.parquet
-                    ├── 02.parquet
-                    └── ...
+`-- klines/
+    `-- ETHUSDT/
+        `-- 1s/
+            `-- 2024/
+                `-- 01/
+                    `-- 01.parquet
 ```
 
-Each parquet file should contain closed candles with these columns:
+Expected candle columns:
 
 - `timestamp`
 - `open`
@@ -296,223 +243,93 @@ Each parquet file should contain closed candles with these columns:
 
 Timestamps should be UTC or convertible into UTC by pandas.
 
-## How To Run Each Part
+## Example Commands
 
-### Backtest
-
-1. Put your local parquet data under the folder configured by `QR_KLINES_BASE_PATH`.
-2. Copy `.env.example` to `.env`.
-3. Set at minimum:
-   - `QR_KLINES_BASE_PATH`
-   - `QR_SYMBOL`
-4. Run:
+### Run the included sample backtest
 
 ```powershell
-py -3 runners\run_backtest.py
+py -3 -m runners.run_backtest
 ```
 
-Outputs go under the folder configured by `QR_REPORTS_BASE_DIR`.
-
-### Paper
-
-1. Copy `.env.example` to `.env`.
-2. Set:
-   - `QR_SYMBOL`
-   - strategy toggles/parameters
-3. Run:
+### Run paper mode
 
 ```powershell
-py -3 runners\run_paper.py
+py -3 -m runners.run_paper
 ```
 
-What happens:
-
-- live market data is pulled from Binance
-- the engine builds candles in real time
-- strategies fire intents
-- `PaperExecutionAdapter` simulates fills locally
-
-### Live
-
-1. Copy `.env.example` to `.env`.
-2. Set:
-   - `QR_SYMBOL`
-   - strategy toggles/parameters
-3. Run:
+### Run live market-data mode
 
 ```powershell
-py -3 runners\run_live.py
+py -3 -m runners.run_live
 ```
 
-What happens:
+## Models And Gates
 
-- live market data is pulled from Binance
-- the engine builds candles in real time
-- strategies fire intents
-- `LiveExecutionAdapter` queues those intents
-
-What does **not** happen:
-
-- no exchange order placement
-- no brokerage credential management
-- no private execution bridge
-
-## Example `.env` Patterns
-
-### Simple EMA backtest
-
-```dotenv
-QR_SYMBOL=ETHUSDT
-QR_ENABLE_EMA_CROSS_5M=true
-QR_ENABLE_ORB_5M=false
-QR_KLINES_BASE_PATH=D:/market_data/klines
-QR_YEARS=2024,2025
-QR_MONTHS=1,12
-QR_FEE_RATE=0.0004
-QR_SLIPPAGE_RATE=0.0002
-```
-
-### Paper trading with both strategies
-
-```dotenv
-QR_SYMBOL=ETHUSDT
-QR_ENABLE_EMA_CROSS_5M=true
-QR_ENABLE_ORB_5M=true
-QR_USE_MODELS=false
-QR_USE_GATES=false
-```
-
-### Model-enabled run
-
-```dotenv
-QR_SYMBOL=ETHUSDT
-QR_USE_MODELS=true
-QR_USE_GATES=false
-QR_MODEL_KLINES_BASE_PATH=D:/market_data/model_klines
-```
-
-## Strategy Customization
-
-There are three easy levels of customization.
-
-### 1. Toggle strategies on or off
-
-Use:
-
-- `QR_ENABLE_EMA_CROSS_5M`
-- `QR_ENABLE_ORB_5M`
-
-### 2. Change strategy parameters from `.env`
-
-For EMA Cross, public parameters are already exposed:
-
-- `QR_EMA_FAST_LEN`
-- `QR_EMA_SLOW_LEN`
-- `QR_EMA_STOP_MODE`
-- `QR_EMA_STOP_VALUE`
-- `QR_EMA_TARGET_MODE`
-- `QR_EMA_TARGET_VALUE`
-
-### 3. Edit or add strategy classes
-
-Relevant files:
-
-- `core/strategies/strategy_ema_cross_5m.py`
-- `core/strategies/strategy_opening_range_breakout_5m.py`
-- `core/strategies/__init__.py`
-
-If you add a new strategy:
-
-1. create the new class in `core/strategies/`
-2. export it from `core/strategies/__init__.py`
-3. instantiate it inside the runner `build_strategies()` function you want to use
-
-## Models and Gates
-
-The public repo keeps the architecture for models and gates, but not the private research stack.
+The public repo keeps these layers for architecture clarity, but ships only placeholder logic.
 
 ### Models
 
-Model orchestration still exists through:
+Relevant files:
 
 - `core/models/model_module.py`
 - `core/models/model_engine.py`
 - `core/models/adapters/`
 
-But the shipped engines are public-safe placeholders intended to preserve the integration shape.
+The shipped model engines are lightweight heuristics whose purpose is to preserve wiring and payload shape, not to expose private research logic.
 
 ### Gates
 
-Gate support is optional and off by default.
+Relevant files:
 
-To use it you need:
+- `core/gates/gate_engine.py`
+- `core/gates/manifest.json`
 
-1. `pip install -e ".[gates]"`
-2. actual gate artifacts compatible with `GateEngine.from_default_artifacts()`
-3. `QR_USE_MODELS=true`
-4. `QR_USE_GATES=true`
+The shipped gate engine is a placeholder pass-through evaluator. It exists to show where strategy filtering happens in the runtime, not to publish a production gate stack.
 
-If you do not have those artifacts, leave gates off.
+## Fees, Slippage, Stops
 
-## Notes on Fees, Slippage, and Stops
+The public runners support:
 
-The public position handler supports:
-
-- ATR-based stop/target planning
-- USD-distance stop/target planning
 - fee simulation
 - slippage simulation
+- ATR-based stops and targets
+- fixed-USD stops and targets
 
-Backtest and paper runners expose:
+The EMA example strategy exposes stop and target modes directly through `.env`.
 
-- `QR_FEE_RATE`
-- `QR_SLIPPAGE_RATE`
+## Anti-Leakage
 
-The EMA example strategy exposes:
+Backtests are easy to contaminate accidentally. The short note here explains the main ideas the repo follows:
 
-- `QR_EMA_STOP_MODE`
-- `QR_EMA_STOP_VALUE`
-- `QR_EMA_TARGET_MODE`
-- `QR_EMA_TARGET_VALUE`
+- `docs/anti_leakage.md`
+
+## Extension Points
+
+If you want to customize the repo cleanly:
+
+1. add new strategies under `core/strategies/`
+2. add new backtest or live adapters under `adapters/`
+3. add custom runners under `runners/`
+4. replace placeholder model adapters under `core/models/adapters/`
+5. replace the placeholder gate engine with your own evaluator
 
 ## Troubleshooting
 
 ### `Klines base path not found`
 
-Set `QR_KLINES_BASE_PATH` to the correct local dataset root.
+Set `QR_KLINES_BASE_PATH` to the correct dataset root.
 
 ### `At least one strategy must be enabled`
 
-Set at least one of:
+Turn on at least one of:
 
 - `QR_ENABLE_EMA_CROSS_5M=true`
 - `QR_ENABLE_ORB_5M=true`
 
 ### `QR_USE_GATES=true requires QR_USE_MODELS=true`
 
-This is expected. Gates depend on model context.
-
-### `Missing dependency: websocket-client`
-
-Install dependencies again:
-
-```bash
-pip install -e .
-```
-
-### Windows timezone / `ZoneInfo` issues
-
-The project includes `tzdata` in `pyproject.toml`, which covers common Windows setups.
-
-## Public Extension Points
-
-If you want to extend this repository cleanly:
-
-- add new strategies under `core/strategies/`
-- add new data sources under `adapters/backtest/` or `adapters/live/`
-- build custom runners under `runners/`
-- plug your own model logic behind `core/models/adapters/`
+This is expected. Gates depend on model context in the runtime flow even though the public gate implementation is only a placeholder.
 
 ## License
 
-This public repository is currently published under the MIT license.
+MIT

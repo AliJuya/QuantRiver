@@ -3,7 +3,6 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 from enum import Enum
-from pathlib import Path
 
 
 class RegimeState(str, Enum):
@@ -41,8 +40,8 @@ class RegimeEngine:
     Public placeholder for the private regime engine.
     """
 
-    def __init__(self, artifacts_selected_dir: str | Path | None = None) -> None:
-        self.artifacts_selected_dir = Path(artifacts_selected_dir) if artifacts_selected_dir is not None else None
+    def __init__(self) -> None:
+        pass
 
     def update(self, *, ts: int, r_1h: float, log_sigma_slow: float) -> RegimeContext:
         del ts
@@ -74,7 +73,3 @@ class RegimeEngine:
             state_tf="1h",
             regime_tf="1h",
         )
-
-
-# Backward-compatible alias for older internal imports.
-RegimeEngineV1 = RegimeEngine

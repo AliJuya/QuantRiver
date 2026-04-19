@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from statistics import pstdev
 from typing import Any
 
-from .contracts import DCState, DFAState, HurstBucket, KalmanTrendState, StructureLabel, StructureState
+from .contracts import DCState, DFAState, HurstBucket, StructureLabel, StructureState, TrendState
 
 
 def _candle_close(candle: Any) -> float:
@@ -108,7 +108,7 @@ class StructureEngine:
                 intrinsic_vol=float(vol_sigma),
                 confidence=float(min(1.0, abs(trend_strength))),
             ),
-            trend=KalmanTrendState(
+            trend=TrendState(
                 level=float(closes[-1]) if closes else 0.0,
                 slope=float(slope),
                 trend_strength=float(trend_strength),

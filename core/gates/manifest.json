@@ -1,8 +1,8 @@
-﻿{
+{
   "version": 1,
+  "description": "Public placeholder gate mapping. Replace with your own evaluator if you want model-based filtering.",
   "strategy_to_gate": {
-    "TBPC_AIV2": "TBPC_AIV2_gate_v1",
-    "TrendBreakPullbackContinue5m": "TBPC_AIV2_gate_v1",
-    "TrendIgnition5m": "TrendIgnition_gate_v1"
+    "EMA_CROSS_5m": "placeholder_gate",
+    "ORB_5m": "placeholder_gate"
   }
 }

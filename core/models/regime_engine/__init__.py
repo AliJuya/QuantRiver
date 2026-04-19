@@ -1,10 +1,7 @@
-from .regime_engine_hmm import RegimeEngineHMM, RegimeState
-from .regime_engine import RegimeContext, RegimeEngine, RegimeEngineV1
+from .regime_engine import RegimeContext, RegimeEngine, RegimeState
 
 __all__ = [
     "RegimeContext",
     "RegimeEngine",
-    "RegimeEngineHMM",
-    "RegimeEngineV1",
     "RegimeState",
 ]

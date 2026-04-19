@@ -1,0 +1,38 @@
+{
+  "symbol": "ETHUSDT",
+  "run_name": "readme_sample__20260420_0216__trail_off",
+  "strategy": "EMA_CROSS_5m",
+  "interval": "2024",
+  "overall": {
+    "starting_balance": 1000.0,
+    "final_balance": 996.8577742530475,
+    "net_pnl": -3.142225746952523,
+    "trades": 4,
+    "wins": 2,
+    "losses": 2,
+    "winrate": 50.0,
+    "max_dd_abs": 7.6471055769033,
+    "max_dd_pct": 0.76471055769033
+  },
+  "years": {
+    "2024": {
+      "starting_balance": 1000.0,
+      "final_balance": 996.8577742530475,
+      "net_pnl": -3.142225746952523,
+      "trades": 4,
+      "wins": 2,
+      "losses": 2,
+      "winrate": 50.0,
+      "max_dd_abs": 7.6471055769033,
+      "max_dd_pct": 0.76471055769033
+    }
+  },
+  "artifacts": {
+    "trades_jsonl": "tmp_sample_reports\\ETHUSDT\\aggregate\\readme_sample__20260420_0216__trail_off\\trades.jsonl",
+    "equity_curve_csv": "tmp_sample_reports\\ETHUSDT\\aggregate\\readme_sample__20260420_0216__trail_off\\equity_curve.csv",
+    "equity_curve_png": "tmp_sample_reports\\ETHUSDT\\aggregate\\readme_sample__20260420_0216__trail_off\\equity_curve.png",
+    "months_csv": "tmp_sample_reports\\ETHUSDT\\aggregate\\readme_sample__20260420_0216__trail_off\\months.csv",
+    "years_csv": "tmp_sample_reports\\ETHUSDT\\aggregate\\readme_sample__20260420_0216__trail_off\\years.csv",
+    "run_config_json": "tmp_sample_reports\\ETHUSDT\\aggregate\\readme_sample__20260420_0216__trail_off\\run_config.json"
+  }
+}

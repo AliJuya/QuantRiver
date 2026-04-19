@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from pathlib import Path
 from typing import Any
 
 from .adapters import RegimeAdapter, StructureAdapter, VolAdapter
@@ -46,8 +45,6 @@ class ModelModule:
         regime_base_tf: str | None = None,
         trigger_tf: str | None = None,
         blocking: bool = True,
-        strict_regime_artifacts: bool = False,
-        regime_artifacts_dir: str | Path | None = None,
     ) -> "ModelModule":
         structure_tf = str(structure_base_tf) if structure_base_tf else _fast_tf_from_pair_key(vol_pair_key)
         regime_tf = str(regime_base_tf) if regime_base_tf else _fast_tf_from_pair_key(regime_pair_key)
@@ -60,8 +57,6 @@ class ModelModule:
                 "regime": RegimeAdapter(
                     base_tf=regime_tf,
                     vol_pair_key=str(regime_pair_key),
-                    artifacts_dir=Path(regime_artifacts_dir) if regime_artifacts_dir is not None else None,
-                    strict_artifacts=bool(strict_regime_artifacts),
                 ),
             },
             trigger_tfs=(selected_trigger_tf,),

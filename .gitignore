@@ -21,6 +21,7 @@ results/
 # Local datasets and trade artifacts
 *.jsonl
 *.parquet
+!data/klines/ETHUSDT/1s/2024/01/01.parquet
 
 # Editors / OS
 .idea/

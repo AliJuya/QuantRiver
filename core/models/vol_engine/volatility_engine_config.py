@@ -42,6 +42,3 @@ VOLATILITY_ENGINE_CONFIG = {
         }
     },
 }
-
-# Backward-compatible alias kept for older call sites.
-VOLATILITY_ENGINE_V1_CONFIG = VOLATILITY_ENGINE_CONFIG

@@ -37,16 +37,16 @@ BACKTEST_SOURCE_TF = "1s"
 # years can be:
 #   [2022, 2025] -> inclusive range 2022..2025
 #   [2022, 2023, 2025] -> explicit list
-YEARS = env_int_list("QR_YEARS", (2022, 2025))
+YEARS = env_int_list("QR_YEARS", (2024, 2024))
 DAY_FROM = env_int("QR_DAY_FROM", 1)
-DAY_TO = env_int("QR_DAY_TO", 31)
+DAY_TO = env_int("QR_DAY_TO", 1)
 START_BALANCE = env_float("QR_START_BALANCE", 1000.0)
 
 # months can be:
 #   [3, 9]  -> inclusive range 3..9
 #   [1, 2, 5, 12] -> explicit list
-MONTHS = env_int_list("QR_MONTHS", (1, 12))
-AUTO_DAY_TO = env_bool("QR_AUTO_DAY_TO", True)
+MONTHS = env_int_list("QR_MONTHS", (1, 1))
+AUTO_DAY_TO = env_bool("QR_AUTO_DAY_TO", False)
 
 AGG_TFS = ("1m", "5m")
 MAX_WORKERS = env_int("QR_MAX_WORKERS", min(8, max(1, (os.cpu_count() or 1) - 1)))

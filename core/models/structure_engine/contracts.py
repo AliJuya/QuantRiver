@@ -39,7 +39,7 @@ class DFAState:
 
 
 @dataclass(frozen=True)
-class KalmanTrendState:
+class TrendState:
     level: float = 0.0
     slope: float = 0.0
     trend_strength: float = 0.0
@@ -52,7 +52,7 @@ class KalmanTrendState:
 class StructureState:
     label: StructureLabel = StructureLabel.UNKNOWN
     dc: DCState = field(default_factory=DCState)
-    trend: KalmanTrendState = field(default_factory=KalmanTrendState)
+    trend: TrendState = field(default_factory=TrendState)
     dfa: DFAState = field(default_factory=DFAState)
     alignment_score: float = 0.0
     struct_energy: float = 0.0

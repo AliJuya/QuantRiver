@@ -126,7 +126,4 @@ class VolatilityEngine:
                 out[(fast_tf, slow_tf)] = state
         return out
 
-
-# Backward-compatible aliases for older internal imports.
 VolState = VolatilityState
-VolatilityEngineV1 = VolatilityEngine

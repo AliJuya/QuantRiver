@@ -19,16 +19,10 @@ DEFAULT_TRAILING_CONFIG: dict[str, Any] = {
 
 
 STRATEGY_TRAILING_OVERRIDES: dict[str, dict[str, Any]] = {
-    "TrendBreakPullbackContinue5m": {
-        "EXTEND_TP": False,
+    "EMA_CROSS_5m": {
+        "EXTEND_TP": True,
     },
-    "TS_TBPC_5m_EDGE": {
-        "EXTEND_TP": False,
-    },
-    "AsymmetricCompositeStack_aggressive": {
-        "EXTEND_TP": False,
-    },
-    "AsymmetricCompositeStack_balanced": {
+    "ORB_5m": {
         "EXTEND_TP": False,
     },
 }

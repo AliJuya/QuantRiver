@@ -24,7 +24,7 @@ What was removed:
 - proprietary feature engineering
 - private latent-state filters
 - trained artifacts and research scripts
-- private v2/v3 model generations
+- production model bundles and strategy-specific gate logic
 
 What replaces it:
 
