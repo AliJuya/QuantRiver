@@ -13,7 +13,7 @@ This public version keeps the architecture, execution flow, and extension points
 - live market-data runner
 - two public example strategies
 - placeholder model and gate integration seams
-- sample ETHUSDT dataset included for a quick local backtest
+- sample synthetic ETHUSDT-style dataset included for a quick local backtest
 
 ## What Is Intentionally Not Included
 
@@ -65,9 +65,9 @@ cp .env.example .env
 
 ### 4. Run the included sample backtest
 
-The repository ships a small sample day at:
+The repository ships a 14-day sample window at:
 
-`data/klines/ETHUSDT/1s/2024/01/01.parquet`
+`data/klines/ETHUSDT/1s/2024/01/01.parquet` through `data/klines/ETHUSDT/1s/2024/01/14.parquet`
 
 With the default public `.env.example`, this command should run against that sample:
 
@@ -82,7 +82,7 @@ Sample output image:
 ## Repository Layout
 
 ```text
-QuantRiver-public/
+QuantRiver/
 |-- adapters/
 |   |-- backtest/
 |   `-- live/
@@ -177,8 +177,8 @@ All runners read environment variables either from your shell or from the repo-r
 
 | Variable | Meaning | Default |
 |---|---|---|
-| `QR_EMA_FAST_LEN` | Fast EMA length | `12` |
-| `QR_EMA_SLOW_LEN` | Slow EMA length | `48` |
+| `QR_EMA_FAST_LEN` | Fast EMA length | `20` |
+| `QR_EMA_SLOW_LEN` | Slow EMA length | `80` |
 | `QR_EMA_STOP_MODE` | `atr` or `usd` | `atr` |
 | `QR_EMA_STOP_VALUE` | Stop size in ATR or USD | `1.5` |
 | `QR_EMA_TARGET_MODE` | `atr` or `usd` | `atr` |
@@ -194,7 +194,7 @@ All runners read environment variables either from your shell or from the repo-r
 | `QR_YEARS` | Years list or inclusive range | `2024,2024` |
 | `QR_MONTHS` | Months list or inclusive range | `1,1` |
 | `QR_DAY_FROM` | Starting day | `1` |
-| `QR_DAY_TO` | Ending day | `1` |
+| `QR_DAY_TO` | Ending day | `14` |
 | `QR_AUTO_DAY_TO` | Auto-expand to month end | `false` |
 | `QR_START_BALANCE` | Starting equity | `1000` |
 | `QR_MAX_WORKERS` | Parallel month workers | `4` |
@@ -229,7 +229,9 @@ data/
         `-- 1s/
             `-- 2024/
                 `-- 01/
-                    `-- 01.parquet
+                    |-- 01.parquet
+                    |-- 02.parquet
+                    `-- 14.parquet
 ```
 
 Expected candle columns:
@@ -242,6 +244,8 @@ Expected candle columns:
 - `volume`
 
 Timestamps should be UTC or convertible into UTC by pandas.
+
+The included sample files are synthetic ETHUSDT-style candles meant for smoke testing and documentation screenshots, not for strategy research.
 
 ## Example Commands
 

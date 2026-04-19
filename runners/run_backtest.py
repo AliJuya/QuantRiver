@@ -39,7 +39,7 @@ BACKTEST_SOURCE_TF = "1s"
 #   [2022, 2023, 2025] -> explicit list
 YEARS = env_int_list("QR_YEARS", (2024, 2024))
 DAY_FROM = env_int("QR_DAY_FROM", 1)
-DAY_TO = env_int("QR_DAY_TO", 1)
+DAY_TO = env_int("QR_DAY_TO", 14)
 START_BALANCE = env_float("QR_START_BALANCE", 1000.0)
 
 # months can be:
@@ -60,8 +60,8 @@ SLIPPAGE_RATE = env_float("QR_SLIPPAGE_RATE", 0.0002)
 ENABLE_EMA_CROSS_5M = env_bool("QR_ENABLE_EMA_CROSS_5M", True)
 ENABLE_ORB_5M = env_bool("QR_ENABLE_ORB_5M", False)
 
-EMA_FAST_LEN = env_int("QR_EMA_FAST_LEN", 12)
-EMA_SLOW_LEN = env_int("QR_EMA_SLOW_LEN", 48)
+EMA_FAST_LEN = env_int("QR_EMA_FAST_LEN", 20)
+EMA_SLOW_LEN = env_int("QR_EMA_SLOW_LEN", 80)
 EMA_STOP_MODE = env_str("QR_EMA_STOP_MODE", "atr")
 EMA_STOP_VALUE = env_float("QR_EMA_STOP_VALUE", 1.5)
 EMA_TARGET_MODE = env_str("QR_EMA_TARGET_MODE", "atr")
